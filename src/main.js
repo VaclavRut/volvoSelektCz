@@ -9,10 +9,9 @@ function textTruncate(str, length, ending) {
     }
     if (str.length > length) {
         return str.substring(0, length - ending.length) + ending;
-    } else {
-        return str;
     }
-};
+    return str;
+}
 
 Apify.main(async () => {
     // Get input of the actor (here only for demonstration purposes).
@@ -34,9 +33,9 @@ Apify.main(async () => {
     // web pages from a given list of URLs
     const basicCrawler = new Apify.CheerioCrawler({
         requestQueue,
-        useApifyProxy:true,
-        apifyProxyGroups:['CZECH_LUMINATI'],
-        maxConcurrency:2,
+        useApifyProxy: true,
+        apifyProxyGroups: ['CZECH_LUMINATI'],
+        maxConcurrency: 2,
         handlePageFunction: async ({ $, request }) => {
             if (request.userData.label === 'LIST') {
                 const vehicleSelector = $('div.vehicle-inner');
@@ -50,7 +49,7 @@ Apify.main(async () => {
                             image,
                         });
                     });
-                    console.log(`Checking of ${detailUrls.length} details`)
+                    console.log(`Checking of ${detailUrls.length} details`);
                     for (const detailUrl of detailUrls) {
                         const responseQueue = await detailsQueue.addRequest({
                             url: detailUrl.detailUrl,
@@ -127,7 +126,7 @@ Apify.main(async () => {
     });
 
     await basicCrawler.run();
-    console.log('Crawling done, now build the email and send it.')
+    console.log('Crawling done, now build the email and send it.');
     // build the email and send it
 
     const env = await Apify.getEnv();
@@ -136,21 +135,21 @@ Apify.main(async () => {
     const emailBodyRows = [];
     await dataset.forEach(async (item) => {
         const bulletPoints = [];
-        Object.keys(item.details).forEach((detail) =>{
-            bulletPoints.push(`<li>${detail} - ${item.details[detail]}</li>`)
-        })
+        Object.keys(item.details).forEach((detail) => {
+            bulletPoints.push(`<li>${detail} - ${item.details[detail]}</li>`);
+        });
         emailBodyRows.push(`
                     <tr>
                         <td><a href=${item.url}>${item.title}</a></td>
                         <td><img src=${item.img}></td> 
                         <td>${item.price}</td> 
                         <td>${item.priceDiscounted}</td> 
-                        <td>${textTruncate(item.description,300)}</td> 
+                        <td>${textTruncate(item.description, 300)}</td> 
                         <td><ul>${bulletPoints.join('')}</ul></td> 
                     </tr>`);
     });
 
-    if (!test) {
+    if (!test && emailBodyRows.length !== 0) {
         await Apify.call(
             'apify/send-mail',
             {
