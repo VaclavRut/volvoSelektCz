@@ -88,8 +88,16 @@ Apify.main(async () => {
                 const title = $('h1 .s-hide').length !== 0 ? $('h1 .s-hide').text() : null;
                 const priceDiscounted = $('.prev-price').length !== 0 ? $('.prev-price').text().trim() : null;
                 if ($('script:contains("dataLayer")').length !== 0) {
-                    const dataLayer = JSON.parse($('script:contains("dataLayer")').text().replace('var dataLayer = ', '').replace(';', '')
-                        .trim())[0];
+                    let dataLayer;
+                    const dataLayerText = $('script:contains("dataLayer")').text();
+                    if (dataLayerText.indexOf('var dataLayer = ') !== -1 && dataLayerText.indexOf('var dataLayerName =') !== -1) {
+                        dataLayer = JSON.parse($('script:contains("dataLayer")').text().replace('var dataLayer = ', '').split('var dataLayerName =')[0].replace(';', '')
+                            .trim())[0];
+                    } else {
+                        dataLayer = JSON.parse($('script:contains("dataLayer")').text().replace('var dataLayer = ', '').replace(';', '')
+                            .trim())[0];
+                    }
+
                     price = dataLayer.VehiclePrice;
                 }
 
