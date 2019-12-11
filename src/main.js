@@ -43,7 +43,7 @@ Apify.main(async () => {
                 if (vehicleSelector.length !== 0) {
                     vehicleSelector.each(function () {
                         const detailUrl = `https://selekt.volvocars.cz${$(this).find('a.title').attr('href')}`;
-                        const image = $(this).find('img').length !== 0 ? $(this).find('img').attr('src') : null;
+                        const image = $(this).find('img').length !== 0 ? `https://selekt.volvocars.cz${$(this).find('img').attr('src')}` : null;
                         detailUrls.push({
                             detailUrl,
                             image,
